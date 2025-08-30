@@ -8,54 +8,63 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 225 15% 15%;
+    /* Crown Diamond Station - Elegant Blue Theme */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 225 15% 15%;
+    --card: 210 20% 99%;
+    --card-foreground: 215 25% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 225 15% 15%;
+    --popover: 210 20% 99%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 217 91% 60%;
+    /* Premium Blue Palette */
+    --primary: 215 90% 55%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 55%;
+    --primary-hover: 215 90% 50%;
+    --primary-light: 215 90% 65%;
+    --primary-glow: 215 90% 75%;
 
-    --secondary: 220 13% 96%;
-    --secondary-foreground: 225 15% 15%;
+    --secondary: 215 25% 96%;
+    --secondary-foreground: 215 25% 20%;
 
-    --muted: 220 13% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 215 15% 95%;
+    --muted-foreground: 215 10% 50%;
 
-    --accent: 217 91% 95%;
-    --accent-foreground: 217 91% 60%;
+    --accent: 215 80% 94%;
+    --accent-foreground: 215 90% 55%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 91% 60%;
+    --border: 215 15% 88%;
+    --input: 215 15% 88%;
+    --ring: 215 90% 55%;
 
-    /* Presentation specific colors */
-    --presentation-bg: 225 25% 8%;
-    --presentation-fg: 0 0% 98%;
-    --presentation-card: 225 25% 12%;
-    --presentation-border: 225 25% 20%;
+    /* Crown Diamond specific colors */
+    --crown-bg: 215 30% 8%;
+    --crown-fg: 210 20% 98%;
+    --crown-card: 215 30% 12%;
+    --crown-border: 215 30% 20%;
+    --crown-accent: 215 90% 55%;
     
-    /* Professional gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
-    --gradient-hero: linear-gradient(135deg, hsl(225 25% 8%), hsl(225 25% 15%));
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(220 13% 98%));
+    /* Elegant Blue Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(215 90% 55%), hsl(215 90% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(215 30% 10%), hsl(215 40% 20%));
+    --gradient-card: linear-gradient(135deg, hsl(210 20% 99%), hsl(215 15% 95%));
+    --gradient-crown: linear-gradient(135deg, hsl(215 90% 55%), hsl(215 90% 75%));
+    --gradient-diamond: linear-gradient(135deg, hsl(215 90% 65%), hsl(220 85% 70%));
     
-    /* Shadows */
-    --shadow-card: 0 4px 6px -1px hsl(220 13% 91% / 0.1), 0 2px 4px -1px hsl(220 13% 91% / 0.06);
-    --shadow-elevated: 0 10px 15px -3px hsl(220 13% 91% / 0.1), 0 4px 6px -2px hsl(220 13% 91% / 0.05);
-    --shadow-presentation: 0 20px 25px -5px hsl(225 25% 8% / 0.3);
+    /* Premium Shadows */
+    --shadow-card: 0 4px 6px -1px hsl(215 30% 20% / 0.08), 0 2px 4px -1px hsl(215 30% 20% / 0.04);
+    --shadow-elevated: 0 10px 15px -3px hsl(215 30% 20% / 0.12), 0 4px 6px -2px hsl(215 30% 20% / 0.06);
+    --shadow-crown: 0 20px 25px -5px hsl(215 90% 55% / 0.25);
+    --shadow-diamond: 0 8px 30px -12px hsl(215 90% 55% / 0.35);
     
-    /* Transitions */
+    /* Smooth Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-elegant: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
     --radius: 0.5rem;
 
@@ -77,34 +86,35 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 225 25% 8%;
-    --foreground: 0 0% 98%;
+    /* Crown Diamond Station - Dark Mode */
+    --background: 215 30% 8%;
+    --foreground: 210 20% 98%;
 
-    --card: 225 25% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 215 30% 12%;
+    --card-foreground: 210 20% 98%;
 
-    --popover: 225 25% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 215 30% 12%;
+    --popover-foreground: 210 20% 98%;
 
-    --primary: 217 91% 60%;
+    --primary: 215 90% 60%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 65%;
+    --primary-hover: 215 90% 65%;
 
-    --secondary: 225 25% 15%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 215 30% 15%;
+    --secondary-foreground: 210 20% 95%;
 
-    --muted: 225 25% 15%;
-    --muted-foreground: 220 9% 65%;
+    --muted: 215 30% 15%;
+    --muted-foreground: 215 15% 65%;
 
-    --accent: 225 25% 15%;
-    --accent-foreground: 217 91% 60%;
+    --accent: 215 30% 18%;
+    --accent-foreground: 215 90% 60%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 225 25% 20%;
-    --input: 225 25% 20%;
-    --ring: 217 91% 60%;
+    --border: 215 30% 20%;
+    --input: 215 30% 20%;
+    --ring: 215 90% 60%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

@@ -27,13 +27,16 @@ export default {
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))',
-					hover: 'hsl(var(--primary-hover))'
+					hover: 'hsl(var(--primary-hover))',
+					light: 'hsl(var(--primary-light))',
+					glow: 'hsl(var(--primary-glow))'
 				},
-				presentation: {
-					bg: 'hsl(var(--presentation-bg))',
-					fg: 'hsl(var(--presentation-fg))',
-					card: 'hsl(var(--presentation-card))',
-					border: 'hsl(var(--presentation-border))'
+				crown: {
+					bg: 'hsl(var(--crown-bg))',
+					fg: 'hsl(var(--crown-fg))',
+					card: 'hsl(var(--crown-card))',
+					border: 'hsl(var(--crown-border))',
+					accent: 'hsl(var(--crown-accent))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -78,16 +81,20 @@ export default {
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-hero': 'var(--gradient-hero)',
-				'gradient-card': 'var(--gradient-card)'
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-crown': 'var(--gradient-crown)',
+				'gradient-diamond': 'var(--gradient-diamond)'
 			},
 			boxShadow: {
 				'card': 'var(--shadow-card)',
 				'elevated': 'var(--shadow-elevated)',
-				'presentation': 'var(--shadow-presentation)'
+				'crown': 'var(--shadow-crown)',
+				'diamond': 'var(--shadow-diamond)'
 			},
 			transitionTimingFunction: {
 				'smooth': 'var(--transition-smooth)',
-				'bounce': 'var(--transition-bounce)'
+				'bounce': 'var(--transition-bounce)',
+				'elegant': 'var(--transition-elegant)'
 			},
 			keyframes: {
 				'accordion-down': {
