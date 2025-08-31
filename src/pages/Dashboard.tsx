@@ -1,185 +1,200 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Monitor, 
-  Settings, 
-  BarChart3, 
-  Users, 
-  Video, 
-  Brain,
-  ArrowLeft,
-  Calendar,
-  Clock
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Crown, Diamond, Brain, Video, History, Settings, Presentation } from "lucide-react";
 
 const Dashboard = () => {
   return (
-    <div className="min-h-screen bg-gradient-card">
-      {/* Header */}
-      <header className="bg-card border-b shadow-card">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link to="/">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Home
+    <div className="min-h-screen bg-gradient-hero">
+      <div className="container mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <Crown className="h-8 w-8 text-primary" />
+              <Diamond className="h-4 w-4 text-primary-light absolute -top-1 -right-1" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-crown bg-clip-text text-transparent">
+                Crown Diamond Station
+              </h1>
+              <p className="text-muted-foreground">Dashboard จัดการระบบ AI Presentation Agent</p>
+            </div>
+          </div>
+          <Link to="/">
+            <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
+              กลับหน้าแรก
+            </Button>
+          </Link>
+        </div>
+
+        {/* Main Dashboard Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Quick Start Presentation */}
+          <Card className="bg-gradient-card border-primary/10 shadow-diamond hover:shadow-crown transition-elegant group">
+            <CardHeader>
+              <Presentation className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-elegant" />
+              <CardTitle className="text-foreground">เริ่มการนำเสนอ</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                เข้าสู่หน้าจอการนำเสนอและใช้งาน AI Agent ทันที
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link to="/presentation">
+                <Button className="w-full bg-gradient-crown hover:shadow-crown transition-elegant">
+                  เริ่มนำเสนอเลย
                 </Button>
               </Link>
-              <div className="flex items-center space-x-2">
-                <Brain className="h-6 w-6 text-primary" />
-                <h1 className="text-2xl font-bold">AI Presentation Dashboard</h1>
-              </div>
-            </div>
-            <Link to="/presentation">
-              <Button className="bg-primary hover:bg-primary-hover">
-                <Monitor className="mr-2 h-4 w-4" />
-                Start Presentation
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-6 py-8">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="shadow-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Presentations</CardTitle>
-              <Monitor className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">24</div>
-              <p className="text-xs text-muted-foreground">+2 from last week</p>
             </CardContent>
           </Card>
 
-          <Card className="shadow-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">AI Responses</CardTitle>
-              <Brain className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">156</div>
-              <p className="text-xs text-muted-foreground">+12% from last month</p>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Content Library</CardTitle>
-              <Video className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">7</div>
-              <p className="text-xs text-muted-foreground">Training videos ready</p>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">94%</div>
-              <p className="text-xs text-muted-foreground">Presentation effectiveness</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Actions */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="shadow-elevated hover:shadow-presentation transition-smooth cursor-pointer">
+          {/* Manage AI Agent */}
+          <Card className="bg-gradient-card border-primary/10 shadow-diamond hover:shadow-crown transition-elegant group">
             <CardHeader>
-              <Monitor className="h-12 w-12 text-primary mb-4" />
-              <CardTitle>Presentation Manager</CardTitle>
-              <CardDescription>
-                จัดการ AI Agent และดูประวัติการนำเสนอที่ผ่านมา
+              <Brain className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-elegant" />
+              <CardTitle className="text-foreground">จัดการ AI Agent</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                บริหารคลังเนื้อหา ดูประวัติ และตั้งค่า AI Agent
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link to="/dashboard/presentation-manager">
-                <Button className="w-full bg-primary hover:bg-primary-hover">
-                  Open Manager
+                <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/10 transition-elegant">
+                  เข้าสู่ระบบจัดการ
                 </Button>
               </Link>
             </CardContent>
           </Card>
 
-          <Card className="shadow-elevated hover:shadow-presentation transition-smooth cursor-pointer">
+          {/* Content Library */}
+          <Card className="bg-gradient-card border-primary/10 shadow-diamond hover:shadow-crown transition-elegant group">
             <CardHeader>
-              <Video className="h-12 w-12 text-primary mb-4" />
-              <CardTitle>Content Library</CardTitle>
-              <CardDescription>
-                จัดการวิดีโอ Training และเนื้อหาสำหรับการนำเสนอ
+              <Video className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-elegant" />
+              <CardTitle className="text-foreground">คลังเนื้อหา</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                จัดการวิดีโอและเนื้อหาที่ AI จะใช้ในการนำเสนอ
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full" disabled>
-                Coming Soon
+              <Link to="/dashboard/presentation-manager">
+                <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/10 transition-elegant">
+                  จัดการคลังเนื้อหา
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Presentation History */}
+          <Card className="bg-gradient-card border-primary/10 shadow-diamond hover:shadow-crown transition-elegant group">
+            <CardHeader>
+              <History className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-elegant" />
+              <CardTitle className="text-foreground">ประวัติการนำเสนอ</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                ดูประวัติคำสั่งและการตอบสนองของ AI ที่ผ่านมา
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link to="/dashboard/presentation-manager">
+                <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/10 transition-elegant">
+                  ดูประวัติ
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Settings */}
+          <Card className="bg-gradient-card border-primary/10 shadow-diamond hover:shadow-crown transition-elegant group">
+            <CardHeader>
+              <Settings className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-elegant" />
+              <CardTitle className="text-foreground">ตั้งค่าระบบ</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                กำหนดค่าการทำงานของ AI Agent และระบบ
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/10 transition-elegant" disabled>
+                กำลังพัฒนา
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="shadow-elevated hover:shadow-presentation transition-smooth cursor-pointer">
+          {/* Quick Stats */}
+          <Card className="bg-gradient-card border-primary/10 shadow-diamond col-span-full md:col-span-2">
             <CardHeader>
-              <BarChart3 className="h-12 w-12 text-primary mb-4" />
-              <CardTitle>Analytics</CardTitle>
-              <CardDescription>
-                วิเคราะห์ประสิทธิภาพการนำเสนอและการตอบสนองของผู้ชม
+              <CardTitle className="text-foreground flex items-center">
+                <Crown className="h-5 w-5 text-primary mr-2" />
+                สถิติการใช้งาน
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                ข้อมูลการใช้งานระบบ AI Presentation Agent
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full" disabled>
-                Coming Soon
-              </Button>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">3</div>
+                  <div className="text-sm text-muted-foreground">เนื้อหาในคลัง</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-sm text-muted-foreground">การนำเสนอ</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-sm text-muted-foreground">คำสั่ง AI</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-sm text-muted-foreground">ผู้เข้าร่วม</div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Recent Activity */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Clock className="mr-2 h-5 w-5" />
-              Recent Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4 p-4 rounded-lg bg-accent/50">
-                <Monitor className="h-8 w-8 text-primary" />
-                <div className="flex-1">
-                  <p className="font-medium">Business Expansion Presentation</p>
-                  <p className="text-sm text-muted-foreground">2 hours ago • 45 minutes duration</p>
+        {/* Quick Actions */}
+        <div className="mt-8">
+          <Card className="bg-gradient-card border-primary/10 shadow-diamond">
+            <CardHeader>
+              <CardTitle className="text-foreground">เริ่มต้นใช้งานอย่างรวดเร็ว</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                ขั้นตอนการตั้งค่าและใช้งานระบบ AI Presentation Agent
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="flex items-start space-x-3">
+                  <div className="bg-primary/10 rounded-full p-2">
+                    <span className="text-primary font-bold">1</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground">เพิ่มเนื้อหา</h4>
+                    <p className="text-sm text-muted-foreground">เพิ่มวิดีโอและคำอธิบายลงในคลังเนื้อหา</p>
+                  </div>
                 </div>
-                <Button variant="outline" size="sm">View</Button>
-              </div>
-              
-              <div className="flex items-center space-x-4 p-4 rounded-lg bg-accent/50">
-                <Brain className="h-8 w-8 text-primary" />
-                <div className="flex-1">
-                  <p className="font-medium">AI Training Data Updated</p>
-                  <p className="text-sm text-muted-foreground">1 day ago • 7 videos processed</p>
+                <div className="flex items-start space-x-3">
+                  <div className="bg-primary/10 rounded-full p-2">
+                    <span className="text-primary font-bold">2</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground">ทดสอบ AI</h4>
+                    <p className="text-sm text-muted-foreground">ลองใช้คำสั่ง AI เพื่อหาเนื้อหาที่ต้องการ</p>
+                  </div>
                 </div>
-                <Button variant="outline" size="sm">Review</Button>
-              </div>
-              
-              <div className="flex items-center space-x-4 p-4 rounded-lg bg-accent/50">
-                <Users className="h-8 w-8 text-primary" />
-                <div className="flex-1">
-                  <p className="font-medium">Client Meeting Preparation</p>
-                  <p className="text-sm text-muted-foreground">3 days ago • Content generated</p>
+                <div className="flex items-start space-x-3">
+                  <div className="bg-primary/10 rounded-full p-2">
+                    <span className="text-primary font-bold">3</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground">เริ่มนำเสนอ</h4>
+                    <p className="text-sm text-muted-foreground">ใช้งานจริงกับลูกค้าหรือผู้ร่วมงาน</p>
+                  </div>
                 </div>
-                <Button variant="outline" size="sm">Open</Button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

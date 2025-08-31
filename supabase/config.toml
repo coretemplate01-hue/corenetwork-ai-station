@@ -1,1 +1,4 @@
 project_id = "cqlhwmxykmjrcdzwknel"
+
+[functions.ai-content-finder]
+verify_jwt = false

@@ -1,292 +1,432 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { 
-  ArrowLeft, 
-  Brain, 
-  Monitor, 
-  Settings, 
-  Play, 
-  Pause,
-  Trash2,
-  Plus,
-  Search,
-  Calendar,
-  Clock,
-  Users
-} from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { Crown, Diamond, Plus, Edit, Trash2, Video, History, Brain, Presentation } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
+
+interface ContentItem {
+  id: string;
+  title: string;
+  description: string;
+  video_url: string;
+  keywords: string[];
+  created_at: string;
+}
+
+interface PresentationHistory {
+  id: string;
+  presentation_id: string;
+  command_text: string;
+  ai_response: string;
+  timestamp: string;
+  content_displayed: ContentItem | null;
+}
 
 const PresentationManager = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [newPrompt, setNewPrompt] = useState("");
+  const [contentLibrary, setContentLibrary] = useState<ContentItem[]>([]);
+  const [history, setHistory] = useState<PresentationHistory[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  const presentations = [
-    {
-      id: 1,
-      title: "Business Expansion Strategy",
-      date: "2024-01-15",
-      duration: "45 min",
-      status: "completed",
-      aiResponses: 12,
-      attendees: 8
-    },
-    {
-      id: 2,
-      title: "Product Launch Presentation",
-      date: "2024-01-14",
-      duration: "32 min",
-      status: "completed",
-      aiResponses: 8,
-      attendees: 15
-    },
-    {
-      id: 3,
-      title: "Q1 Performance Review",
-      date: "2024-01-12",
-      duration: "28 min",
-      status: "draft",
-      aiResponses: 5,
-      attendees: 0
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    video_url: "",
+    keywords: ""
+  });
+
+  useEffect(() => {
+    loadContentLibrary();
+    loadPresentationHistory();
+  }, []);
+
+  const loadContentLibrary = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('content_library')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setContentLibrary(data || []);
+    } catch (error) {
+      console.error('Error loading content library:', error);
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถโหลดคลังเนื้อหาได้",
+        variant: "destructive",
+      });
     }
-  ];
-
-  const aiPrompts = [
-    "แสดงวิดีโอ training เรื่อง business expansion",
-    "สรุปเนื้อหาสำหรับลูกค้า",
-    "แสดงข้อมูลเปรียบเทียบ",
-    "เปิดวิดีโอการฝึกอบรม",
-    "แสดงกราฟยอดขาย"
-  ];
-
-  const handleCreatePrompt = () => {
-    if (!newPrompt.trim()) return;
-    
-    toast({
-      title: "Prompt Added",
-      description: "New AI prompt has been saved successfully",
-    });
-    
-    setNewPrompt("");
   };
 
-  const handleDeletePresentation = (id: number) => {
-    toast({
-      title: "Presentation Deleted",
-      description: "Presentation has been removed from history",
+  const loadPresentationHistory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('presentation_history')
+        .select(`
+          *,
+          content_displayed:content_library(*)
+        `)
+        .order('timestamp', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      setHistory(data || []);
+    } catch (error) {
+      console.error('Error loading presentation history:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title || !formData.description || !formData.video_url) {
+      toast({
+        title: "ข้อมูลไม่ครบ",
+        description: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const keywords = formData.keywords
+        .split(',')
+        .map(k => k.trim())
+        .filter(k => k.length > 0);
+
+      if (editingItem) {
+        // Update existing item
+        const { error } = await supabase
+          .from('content_library')
+          .update({
+            title: formData.title,
+            description: formData.description,
+            video_url: formData.video_url,
+            keywords
+          })
+          .eq('id', editingItem.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "อัปเดตสำเร็จ",
+          description: "เนื้อหาถูกอัปเดตเรียบร้อยแล้ว",
+        });
+      } else {
+        // Create new item
+        const { error } = await supabase
+          .from('content_library')
+          .insert({
+            title: formData.title,
+            description: formData.description,
+            video_url: formData.video_url,
+            keywords
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "เพิ่มสำเร็จ",
+          description: "เนื้อหาใหม่ถูกเพิ่มเข้าคลังแล้ว",
+        });
+      }
+
+      resetForm();
+      setIsDialogOpen(false);
+      loadContentLibrary();
+    } catch (error) {
+      console.error('Error saving content:', error);
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถบันทึกเนื้อหาได้",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEdit = (item: ContentItem) => {
+    setEditingItem(item);
+    setFormData({
+      title: item.title,
+      description: item.description,
+      video_url: item.video_url,
+      keywords: item.keywords?.join(', ') || ''
     });
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('คุณแน่ใจหรือไม่ที่จะลบเนื้อหานี้?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('content_library')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "ลบสำเร็จ",
+        description: "เนื้อหาถูกลบออกจากคลังแล้ว",
+      });
+      loadContentLibrary();
+    } catch (error) {
+      console.error('Error deleting content:', error);
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถลบเนื้อหาได้",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({ title: "", description: "", video_url: "", keywords: "" });
+    setEditingItem(null);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-card">
-      {/* Header */}
-      <header className="bg-card border-b shadow-card">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link to="/dashboard">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Dashboard
-                </Button>
-              </Link>
-              <div className="flex items-center space-x-2">
-                <Settings className="h-6 w-6 text-primary" />
-                <h1 className="text-2xl font-bold">Presentation Manager</h1>
-              </div>
+    <div className="min-h-screen bg-gradient-hero">
+      <div className="container mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <Crown className="h-8 w-8 text-primary" />
+              <Diamond className="h-4 w-4 text-primary-light absolute -top-1 -right-1" />
             </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-crown bg-clip-text text-transparent">
+                จัดการ AI Agent
+              </h1>
+              <p className="text-muted-foreground">บริหารจัดการคลังเนื้อหาและติดตามประวัติการนำเสนอ</p>
+            </div>
+          </div>
+          <div className="flex space-x-4">
             <Link to="/presentation">
-              <Button className="bg-primary hover:bg-primary-hover">
-                <Monitor className="mr-2 h-4 w-4" />
-                New Presentation
+              <Button className="bg-gradient-crown hover:shadow-crown">
+                <Presentation className="mr-2 h-4 w-4" />
+                เริ่มการนำเสนอ
+              </Button>
+            </Link>
+            <Link to="/dashboard">
+              <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
+                กลับ Dashboard
               </Button>
             </Link>
           </div>
         </div>
-      </header>
 
-      <main className="container mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* AI Prompt Management */}
-          <div className="lg:col-span-1 space-y-6">
-            <Card className="shadow-elevated">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Content Library Management */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="bg-gradient-card border-primary/10 shadow-diamond">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Brain className="mr-2 h-5 w-5" />
-                  AI Prompt Manager
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Video className="h-5 w-5 text-primary" />
+                    <CardTitle>คลังเนื้อหา</CardTitle>
+                  </div>
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        size="sm" 
+                        className="bg-gradient-crown hover:shadow-crown"
+                        onClick={() => resetForm()}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        เพิ่มเนื้อหา
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>
+                          {editingItem ? 'แก้ไขเนื้อหา' : 'เพิ่มเนื้อหาใหม่'}
+                        </DialogTitle>
+                        <DialogDescription>
+                          กรอกข้อมูลเนื้อหาที่ต้องการเพิ่มเข้าคลัง
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                          <label className="text-sm font-medium">หัวข้อ</label>
+                          <Input
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            placeholder="เช่น: แผนการตลาดดิจิทัล"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">คำอธิบาย</label>
+                          <Textarea
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            placeholder="อธิบายเนื้อหาของวิดีโอ..."
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">URL วิดีโอ</label>
+                          <Input
+                            type="url"
+                            value={formData.video_url}
+                            onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                            placeholder="https://example.com/video"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">คำสำคัญ (คั่นด้วยจุลภาค)</label>
+                          <Input
+                            value={formData.keywords}
+                            onChange={(e) => setFormData({ ...formData, keywords: e.target.value })}
+                            placeholder="การตลาด, ดิจิทัล, โซเชียล"
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setIsDialogOpen(false)}
+                          >
+                            ยกเลิก
+                          </Button>
+                          <Button type="submit" disabled={isLoading}>
+                            {isLoading ? "กำลังบันทึก..." : editingItem ? "อัปเดต" : "เพิ่ม"}
+                          </Button>
+                        </div>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
                 <CardDescription>
-                  จัดการคำสั่งสำหรับ AI Agent
+                  จัดการวิดีโอและเนื้อหาที่ AI Agent จะใช้ในการนำเสนอ
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Create New Prompt</label>
-                  <Textarea
-                    placeholder="พิมพ์คำสั่งใหม่สำหรับ AI Agent..."
-                    value={newPrompt}
-                    onChange={(e) => setNewPrompt(e.target.value)}
-                    className="min-h-[80px]"
-                  />
-                  <Button 
-                    onClick={handleCreatePrompt}
-                    className="w-full"
-                    disabled={!newPrompt.trim()}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Prompt
-                  </Button>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Quick Prompts</label>
-                  <div className="space-y-2">
-                    {aiPrompts.map((prompt, index) => (
-                      <div key={index} className="flex items-center space-x-2 p-2 rounded-lg bg-accent/50">
-                        <Button variant="ghost" size="sm" className="flex-1 justify-start text-xs p-1">
-                          {prompt}
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6">
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle>AI Status</CardTitle>
-              </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Agent Status</span>
-                    <Badge variant="default" className="bg-green-500">Active</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Training Data</span>
-                    <Badge variant="secondary">7 Videos</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Response Time</span>
-                    <span className="text-sm text-muted-foreground">0.8s avg</span>
-                  </div>
+                <div className="space-y-4">
+                  {contentLibrary.map((item) => (
+                    <Card key={item.id} className="border-primary/10">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-foreground mb-2">{item.title}</h4>
+                            <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
+                            {item.keywords && item.keywords.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mb-3">
+                                {item.keywords.map((keyword, index) => (
+                                  <Badge key={index} variant="secondary" className="text-xs">
+                                    {keyword}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                              {item.video_url}
+                            </p>
+                          </div>
+                          <div className="flex space-x-2 ml-4">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(item)}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDelete(item.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {contentLibrary.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Video className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                      <p>ยังไม่มีเนื้อหาในคลัง</p>
+                      <p className="text-sm">เพิ่มเนื้อหาแรกของคุณเพื่อเริ่มต้นใช้งาน</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Presentation History */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="shadow-card">
+          <div className="space-y-6">
+            <Card className="bg-gradient-card border-primary/10 shadow-diamond">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Presentation History</CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search presentations..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 w-64"
-                      />
-                    </div>
-                  </div>
+                <div className="flex items-center space-x-2">
+                  <History className="h-5 w-5 text-primary" />
+                  <CardTitle>ประวัติการนำเสนอ</CardTitle>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {presentations
-                    .filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()))
-                    .map((presentation) => (
-                    <div key={presentation.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-smooth">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <h3 className="font-semibold">{presentation.title}</h3>
-                            <Badge 
-                              variant={presentation.status === 'completed' ? 'default' : 'secondary'}
-                            >
-                              {presentation.status}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center space-x-6 text-sm text-muted-foreground">
-                            <div className="flex items-center space-x-1">
-                              <Calendar className="h-4 w-4" />
-                              <span>{presentation.date}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Clock className="h-4 w-4" />
-                              <span>{presentation.duration}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Brain className="h-4 w-4" />
-                              <span>{presentation.aiResponses} responses</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Users className="h-4 w-4" />
-                              <span>{presentation.attendees} attendees</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm">
-                            {presentation.status === 'completed' ? (
-                              <>
-                                <Play className="mr-2 h-4 w-4" />
-                                Review
-                              </>
-                            ) : (
-                              <>
-                                <Monitor className="mr-2 h-4 w-4" />
-                                Continue
-                              </>
-                            )}
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleDeletePresentation(presentation.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle>Training Content</CardTitle>
                 <CardDescription>
-                  วิดีโอและเนื้อหาที่ใช้ในการฝึก AI Agent
+                  คำสั่งและการตอบสนองของ AI ล่าสุด
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Training content will be available after Supabase integration</p>
-                    <p className="text-sm">Connect to Supabase to manage video content library</p>
-                  </div>
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {history.map((item) => (
+                    <Card key={item.id} className="border-primary/10">
+                      <CardContent className="p-4">
+                        <div className="space-y-2">
+                          <div>
+                            <span className="text-xs font-medium text-primary">คำสั่ง:</span>
+                            <p className="text-sm text-foreground">{item.command_text}</p>
+                          </div>
+                          {item.ai_response && (
+                            <div>
+                              <span className="text-xs font-medium text-primary">AI ตอบ:</span>
+                              <p className="text-sm text-muted-foreground">{item.ai_response}</p>
+                            </div>
+                          )}
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(item.timestamp).toLocaleString('th-TH')}
+                            </span>
+                            {item.content_displayed && (
+                              <Badge variant="outline" className="text-xs">
+                                <Brain className="h-3 w-3 mr-1" />
+                                แสดงเนื้อหา
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {history.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p className="text-sm">ยังไม่มีประวัติการนำเสนอ</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
