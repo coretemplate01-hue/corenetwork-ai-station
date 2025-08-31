@@ -14,7 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      content_library: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          keywords: string[] | null
+          title: string
+          updated_at: string
+          video_url: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          keywords?: string[] | null
+          title: string
+          updated_at?: string
+          video_url: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          keywords?: string[] | null
+          title?: string
+          updated_at?: string
+          video_url?: string
+        }
+        Relationships: []
+      }
+      presentation_history: {
+        Row: {
+          ai_response: string | null
+          command_text: string
+          content_displayed: string | null
+          id: string
+          presentation_id: string
+          timestamp: string
+        }
+        Insert: {
+          ai_response?: string | null
+          command_text: string
+          content_displayed?: string | null
+          id?: string
+          presentation_id: string
+          timestamp?: string
+        }
+        Update: {
+          ai_response?: string | null
+          command_text?: string
+          content_displayed?: string | null
+          id?: string
+          presentation_id?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presentation_history_content_displayed_fkey"
+            columns: ["content_displayed"]
+            isOneToOne: false
+            referencedRelation: "content_library"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "presentation_history_presentation_id_fkey"
+            columns: ["presentation_id"]
+            isOneToOne: false
+            referencedRelation: "presentations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      presentations: {
+        Row: {
+          created_at: string
+          current_content_id: string | null
+          id: string
+          presenter_name: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_content_id?: string | null
+          id?: string
+          presenter_name?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_content_id?: string | null
+          id?: string
+          presenter_name?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presentations_current_content_id_fkey"
+            columns: ["current_content_id"]
+            isOneToOne: false
+            referencedRelation: "content_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
