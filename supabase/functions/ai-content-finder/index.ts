@@ -2,10 +2,10 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.1';
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
 
-if (!openAIApiKey) {
-  console.error('OpenAI API key is not set');
+if (!geminiApiKey) {
+  console.error('Gemini API key is not set');
 }
 const supabaseUrl = 'https://cqlhwmxykmjrcdzwknel.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxbGh3bXh5a21qcmNkendrbmVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1MjI2OTcsImV4cCI6MjA3MjA5ODY5N30.h-0XdUkoXlj8mry28LMQnNtHs_hUer380b1LbEYg1aE';
@@ -36,15 +36,15 @@ serve(async (req) => {
       throw new Error(`Database error: ${contentError.message}`);
     }
 
-    // Use OpenAI to analyze the command and find the most relevant content
+    // Use Gemini AI to analyze the command and find the most relevant content
     const contentDescriptions = contentLibrary.map(item => 
       `ID: ${item.id}, Title: ${item.title}, Description: ${item.description}, Keywords: ${item.keywords?.join(', ')}`
     ).join('\n');
 
     let aiResult;
     
-    if (!openAIApiKey) {
-      // Fallback: Simple keyword matching when OpenAI is not available
+    if (!geminiApiKey) {
+      // Fallback: Simple keyword matching when Gemini is not available
       const commandLower = command.toLowerCase();
       const matchedContent = contentLibrary.find(item => {
         const titleMatch = item.title.toLowerCase().includes(commandLower);
@@ -65,22 +65,21 @@ serve(async (req) => {
           : "ลองใช้คำศัพท์เช่น 'crown diamond', 'network', 'security', 'business', 'training'"
       };
     } else {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: `คุณเป็น AI Assistant สำหรับระบบนำเสนอของ Crown Diamond Station - WCI-CoreNetwork
+          contents: [{
+            parts: [{
+              text: `คุณเป็น AI Assistant สำหรับระบบนำเสนอของ Crown Diamond Station - WCI-CoreNetwork
               ภารกิจของคุณคือวิเคราะห์คำสั่งจากผู้นำเสนอ และหาเนื้อหาที่เหมาะสมที่สุดจากคลังเนื้อหา
               
               คลังเนื้อหาที่มี:
               ${contentDescriptions}
+              
+              คำสั่งจากผู้ใช้: ${command}
               
               ให้ตอบกลับในรูปแบบ JSON ดังนี้:
               {
@@ -88,22 +87,29 @@ serve(async (req) => {
                 "response": "คำตอบที่เป็นมิตรและชี้แจงว่าทำไมเลือกเนื้อหานี้ หรือแนะนำทางเลือกอื่น",
                 "suggestion": "คำแนะนำเพิ่มเติมสำหรับการนำเสนอ"
               }`
-            },
-            {
-              role: 'user',
-              content: command
-            }
-          ],
-          temperature: 0.3,
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 1024,
+          }
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status}`);
+        throw new Error(`Gemini API error: ${response.status}`);
       }
 
       const aiResponse = await response.json();
-      aiResult = JSON.parse(aiResponse.choices[0].message.content);
+      const generatedText = aiResponse.candidates[0].content.parts[0].text;
+      
+      // Extract JSON from the response
+      const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        aiResult = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('Invalid JSON response from Gemini');
+      }
     }
 
     // Get the selected content details if any
