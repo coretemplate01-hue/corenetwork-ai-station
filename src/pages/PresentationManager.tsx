@@ -222,9 +222,14 @@ const PresentationManager = () => {
                 เริ่มการนำเสนอ
               </Button>
             </Link>
+            <Link to="/">
+              <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
+                กลับหน้าแรก
+              </Button>
+            </Link>
             <Link to="/dashboard">
               <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
-                กลับ Dashboard
+                Dashboard
               </Button>
             </Link>
           </div>

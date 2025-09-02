@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { Crown, Diamond, Send, ChevronLeft, ChevronRight, Monitor, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 interface ContentItem {
   id: string;
@@ -158,9 +159,16 @@ const Presentation = () => {
               Crown Diamond Station
             </span>
           </div>
-          <div className="flex items-center space-x-2">
-            <Monitor className="h-4 w-4 text-primary" />
-            <span className="text-sm text-muted-foreground">โหมดการนำเสนอ</span>
+          <div className="flex items-center space-x-4">
+            <Link to="/">
+              <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
+                กลับหน้าแรก
+              </Button>
+            </Link>
+            <div className="flex items-center space-x-2">
+              <Monitor className="h-4 w-4 text-primary" />
+              <span className="text-sm text-muted-foreground">โหมดการนำเสนอ</span>
+            </div>
           </div>
         </div>
       </header>
