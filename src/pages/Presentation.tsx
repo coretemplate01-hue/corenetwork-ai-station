@@ -155,256 +155,216 @@ const Presentation = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col">
-      {/* Clean Header */}
-      <header className="px-6 py-4 border-b border-primary/10">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center space-x-3">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
+      {/* Mobile-First Header */}
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-2">
             <div className="relative">
-              <Crown className="h-6 w-6 text-primary" />
-              <Diamond className="h-3 w-3 text-primary-light absolute -top-1 -right-1" />
+              <Crown className="h-5 w-5 text-primary" />
+              <Diamond className="h-2 w-2 text-primary absolute -top-0.5 -right-0.5" />
             </div>
-            <span className="text-lg font-semibold bg-gradient-crown bg-clip-text text-transparent">
+            <span className="font-semibold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent hidden sm:block">
               Crown Diamond Station
             </span>
           </div>
-          <div className="flex items-center space-x-4">
+          
+          <div className="flex items-center gap-2">
             <Link to="/">
-              <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
-                กลับหน้าแรก
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+                <ChevronLeft className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">กลับ</span>
               </Button>
             </Link>
-            <div className="flex items-center space-x-2">
-              <Monitor className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">โหมดการนำเสนอ</span>
+            <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
+              <Monitor className="h-3 w-3" />
+              <span>นำเสนอ</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex">
-        {/* Content Display Area */}
-        <div className="flex-1 p-6">
-          <div className="max-w-4xl mx-auto">
-            {currentContent ? (
-              <Card className="bg-gradient-card border-primary/10 shadow-crown">
-                <CardContent className="p-8">
-                  <div className="text-center mb-6">
-                    <h1 className="text-3xl font-bold text-foreground mb-4">
-                      {currentContent.title}
-                    </h1>
-                    <p className="text-lg text-muted-foreground mb-6">
-                      {currentContent.description}
-                    </p>
-                    {currentContent.keywords && currentContent.keywords.length > 0 && (
-                      <div className="flex flex-wrap gap-2 justify-center mb-6">
-                        {currentContent.keywords.map((keyword, index) => (
-                          <Badge key={index} variant="secondary" className="text-primary">
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Video Display */}
-                  <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-6">
-                    {currentContent.video_url ? (
-                      (() => {
-                        let embedUrl = '';
-                        const url = currentContent.video_url;
+      {/* Main Content */}
+      <main className="container mx-auto p-4 max-w-6xl">
+        {currentContent ? (
+          <div className="space-y-4">
+            {/* Video Section - Full Width & Prominent */}
+            <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-border/50">
+              <div className="relative">
+                {/* Video Container */}
+                <div className="aspect-video bg-black rounded-t-lg overflow-hidden">
+                  {currentContent.video_url ? (
+                    (() => {
+                      const url = currentContent.video_url;
+                      
+                      // YouTube URL handling
+                      if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                        let videoId = '';
                         
-                        // YouTube URL handling
-                        if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                          let videoId = '';
-                          
-                          if (url.includes('youtube.com/watch?v=')) {
-                            videoId = url.split('watch?v=')[1].split('&')[0];
-                          } else if (url.includes('youtube.com/embed/')) {
-                            videoId = url.split('embed/')[1].split('?')[0];
-                          } else if (url.includes('youtu.be/')) {
-                            videoId = url.split('youtu.be/')[1].split('?')[0];
-                          }
-                          
-                          if (videoId) {
-                            embedUrl = `https://www.youtube.com/embed/${videoId}`;
-                            return (
-                              <iframe
-                                src={embedUrl}
-                                className="w-full h-full"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                title={currentContent.title}
-                              />
-                            );
-                          }
+                        if (url.includes('youtube.com/watch?v=')) {
+                          videoId = url.split('watch?v=')[1].split('&')[0];
+                        } else if (url.includes('youtube.com/embed/')) {
+                          videoId = url.split('embed/')[1].split('?')[0];
+                        } else if (url.includes('youtu.be/')) {
+                          videoId = url.split('youtu.be/')[1].split('?')[0];
                         }
                         
-                        // Regular video file
-                        if (url.match(/\.(mp4|webm|ogg|mov|avi)$/i)) {
+                        if (videoId) {
                           return (
-                            <video
-                              src={url}
-                              controls
-                              className="w-full h-full object-cover"
-                              preload="metadata"
-                            >
-                              <p className="text-muted-foreground p-4">
-                                เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ
-                              </p>
-                            </video>
+                            <iframe
+                              src={`https://www.youtube.com/embed/${videoId}?modestbranding=1&rel=0`}
+                              className="w-full h-full"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                              title={currentContent.title}
+                            />
                           );
                         }
-                        
-                        // Fallback for unsupported formats
+                      }
+                      
+                      // Regular video file
+                      if (url.match(/\.(mp4|webm|ogg|mov|avi)$/i)) {
                         return (
-                          <div className="flex items-center justify-center h-full bg-muted">
-                            <div className="text-center p-6">
-                              <Monitor className="h-16 w-16 text-primary mx-auto mb-4" />
-                              <p className="text-muted-foreground mb-2">รูปแบบวิดีโอไม่รองรับ</p>
-                              <a 
-                                href={url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-primary hover:underline text-sm"
-                              >
+                          <video
+                            src={url}
+                            controls
+                            className="w-full h-full object-cover bg-black"
+                            preload="metadata"
+                            playsInline
+                          >
+                            <p className="text-white p-4 text-center">
+                              เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ
+                            </p>
+                          </video>
+                        );
+                      }
+                      
+                      // Fallback
+                      return (
+                        <div className="flex items-center justify-center h-full bg-muted">
+                          <div className="text-center p-6">
+                            <Monitor className="h-12 w-12 text-primary mx-auto mb-3" />
+                            <p className="text-muted-foreground mb-2 text-sm">รูปแบบวิดีโอไม่รองรับ</p>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              asChild
+                              className="text-xs"
+                            >
+                              <a href={url} target="_blank" rel="noopener noreferrer">
                                 เปิดดูในหน้าต่างใหม่
                               </a>
-                            </div>
+                            </Button>
                           </div>
-                        );
-                      })()
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <div className="text-center">
-                          <Monitor className="h-16 w-16 text-primary mx-auto mb-4" />
-                          <p className="text-muted-foreground">ไม่มีวิดีโอ</p>
                         </div>
+                      );
+                    })()
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-muted">
+                      <div className="text-center p-6">
+                        <Monitor className="h-12 w-12 text-primary mx-auto mb-3" />
+                        <p className="text-muted-foreground text-sm">ไม่มีวิดีโอ</p>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Navigation Controls */}
-                  <div className="flex justify-between items-center">
+                {/* Video Info Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 text-white">
+                  <h1 className="font-bold text-lg mb-1 line-clamp-2">{currentContent.title}</h1>
+                  {contentLibrary.length > 1 && (
+                    <p className="text-xs text-white/80">
+                      {currentIndex + 1} / {contentLibrary.length}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Content Details */}
+              <CardContent className="p-4">
+                <p className="text-muted-foreground mb-3 text-sm leading-relaxed">
+                  {currentContent.description}
+                </p>
+                
+                {/* Keywords */}
+                {currentContent.keywords && currentContent.keywords.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {currentContent.keywords.map((keyword, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs px-2 py-1">
+                        {keyword}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* Navigation Controls - Mobile Optimized */}
+                {contentLibrary.length > 1 && (
+                  <div className="flex justify-between items-center gap-4">
                     <Button
                       variant="outline"
+                      size="sm"
                       onClick={() => navigateContent('prev')}
-                      className="border-primary/20 text-primary hover:bg-primary/10"
-                      disabled={contentLibrary.length <= 1}
+                      className="flex-1 h-9"
                     >
-                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      <ChevronLeft className="h-4 w-4 mr-1" />
                       ก่อนหน้า
                     </Button>
                     
-                    <span className="text-sm text-muted-foreground">
-                      {currentIndex + 1} / {contentLibrary.length}
-                    </span>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground px-2">
+                      <span className="font-medium">{currentIndex + 1}</span>
+                      <span>/</span>
+                      <span>{contentLibrary.length}</span>
+                    </div>
                     
                     <Button
                       variant="outline"
+                      size="sm"
                       onClick={() => navigateContent('next')}
-                      className="border-primary/20 text-primary hover:bg-primary/10"
-                      disabled={contentLibrary.length <= 1}
+                      className="flex-1 h-9"
                     >
                       ถัดไป
-                      <ChevronRight className="h-4 w-4 ml-2" />
+                      <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="bg-gradient-card border-primary/10 shadow-diamond">
-                <CardContent className="p-8 text-center">
-                  <Crown className="h-16 w-16 text-primary mx-auto mb-4" />
-                  <h2 className="text-2xl font-bold text-foreground mb-4">
-                    ยินดีต้อนรับสู่ Crown Diamond Station
-                  </h2>
-                  <p className="text-muted-foreground mb-6">
-                    ใช้คำสั่ง AI ในช่องด้านล่างเพื่อเริ่มการนำเสนอ
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    ตัวอย่าง: "ขอดูเนื้อหาเกี่ยวกับการตลาดดิจิทัล" หรือ "อยากรู้เรื่องการทำแบรนด์"
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
+                )}
+              </CardContent>
+            </Card>
 
-        {/* AI Control Panel */}
-        <div className="w-80 border-l border-primary/10 bg-background/50 backdrop-blur-sm">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
-              <Diamond className="h-5 w-5 text-primary mr-2" />
-              ระบบควบคุม AI
-            </h3>
-            
-            <div className="space-y-4">
-              {/* Command Input */}
-              <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">
-                  พิมพ์คำสั่งของคุณ
-                </label>
-                <div className="flex gap-2">
+            {/* AI Control - Mobile Optimized */}
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Diamond className="h-4 w-4 text-primary" />
+                  <h3 className="font-semibold text-sm">ควบคุม AI</h3>
+                </div>
+                
+                {/* Command Input */}
+                <div className="flex gap-2 mb-3">
                   <Input
                     value={command}
                     onChange={(e) => setCommand(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="เช่น: ขอดูวิดีโอเกี่ยวกับการตลาด"
-                    className="flex-1"
+                    placeholder="พิมพ์คำสั่งของคุณ..."
+                    className="flex-1 h-9"
                     disabled={isLoading}
                   />
                   <Button
                     onClick={handleCommand}
                     disabled={isLoading || !command.trim()}
-                    size="icon"
-                    className="bg-gradient-crown hover:shadow-crown"
+                    size="sm"
+                    className="h-9 px-3"
                   >
                     {isLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-3 w-3 animate-spin" />
                     ) : (
-                      <Send className="h-4 w-4" />
+                      <Send className="h-3 w-3" />
                     )}
                   </Button>
                 </div>
-              </div>
 
-              <Separator />
-
-              {/* AI Response */}
-              {aiResponse && (
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    คำตอบจาก AI
-                  </label>
-                  <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground">
-                    {aiResponse}
-                  </div>
-                </div>
-              )}
-
-              {/* AI Suggestion */}
-              {suggestion && (
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    คำแนะนำ
-                  </label>
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-sm text-primary">
-                    {suggestion}
-                  </div>
-                </div>
-              )}
-
-              <Separator />
-
-              {/* Quick Commands */}
-              <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">
-                  คำสั่งแนะนำ
-                </label>
-                <div className="space-y-2">
+                {/* Quick Commands */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
                   {[
                     "ขอดูวิดีโอเกี่ยวกับการตลาด",
                     "อยากรู้เรื่องการทำแบรนด์",
@@ -415,16 +375,89 @@ const Presentation = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => setCommand(cmd)}
-                      className="w-full justify-start text-left text-xs h-auto p-2 text-muted-foreground hover:text-primary"
+                      className="text-xs h-8 justify-start text-muted-foreground hover:text-primary"
                     >
                       {cmd}
                     </Button>
                   ))}
                 </div>
-              </div>
-            </div>
+
+                {/* AI Responses */}
+                {(aiResponse || suggestion) && (
+                  <div className="space-y-2">
+                    {aiResponse && (
+                      <div className="bg-muted/50 rounded-md p-3">
+                        <p className="text-xs font-medium text-foreground mb-1">AI ตอบ:</p>
+                        <p className="text-xs text-muted-foreground">{aiResponse}</p>
+                      </div>
+                    )}
+                    {suggestion && (
+                      <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
+                        <p className="text-xs font-medium text-primary mb-1">คำแนะนำ:</p>
+                        <p className="text-xs text-primary/80">{suggestion}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
-        </div>
+        ) : (
+          /* Welcome State - Mobile Optimized */
+          <div className="text-center py-12">
+            <Crown className="h-16 w-16 text-primary mx-auto mb-6" />
+            <h2 className="text-2xl font-bold text-foreground mb-4">
+              ยินดีต้อนรับสู่ Crown Diamond Station
+            </h2>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              ใช้คำสั่ง AI เพื่อค้นหาและดูวิดีโอการนำเสนอ
+            </p>
+            
+            {/* Quick Start Input */}
+            <Card className="max-w-md mx-auto bg-card/50 backdrop-blur-sm border-border/50">
+              <CardContent className="p-4">
+                <div className="flex gap-2 mb-3">
+                  <Input
+                    value={command}
+                    onChange={(e) => setCommand(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="เช่น: ขอดูวิดีโอการตลาด"
+                    className="flex-1"
+                    disabled={isLoading}
+                  />
+                  <Button
+                    onClick={handleCommand}
+                    disabled={isLoading || !command.trim()}
+                    size="sm"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                
+                <div className="grid gap-2">
+                  {[
+                    "ขอดูวิดีโอเกี่ยวกับการตลาด",
+                    "อยากรู้เรื่องการทำแบรนด์"
+                  ].map((cmd) => (
+                    <Button
+                      key={cmd}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCommand(cmd)}
+                      className="text-xs justify-start text-muted-foreground hover:text-primary"
+                    >
+                      {cmd}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </main>
     </div>
   );
