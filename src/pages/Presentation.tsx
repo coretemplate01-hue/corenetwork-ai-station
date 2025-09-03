@@ -211,29 +211,71 @@ const Presentation = () => {
                   {/* Video Display */}
                   <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-6">
                     {currentContent.video_url ? (
-                      currentContent.video_url.includes('youtube.com') || currentContent.video_url.includes('youtu.be') ? (
-                        <iframe
-                          src={currentContent.video_url.includes('youtube.com') 
-                            ? currentContent.video_url.replace('watch?v=', 'embed/')
-                            : currentContent.video_url.replace('youtu.be/', 'youtube.com/embed/')
+                      (() => {
+                        let embedUrl = '';
+                        const url = currentContent.video_url;
+                        
+                        // YouTube URL handling
+                        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                          let videoId = '';
+                          
+                          if (url.includes('youtube.com/watch?v=')) {
+                            videoId = url.split('watch?v=')[1].split('&')[0];
+                          } else if (url.includes('youtube.com/embed/')) {
+                            videoId = url.split('embed/')[1].split('?')[0];
+                          } else if (url.includes('youtu.be/')) {
+                            videoId = url.split('youtu.be/')[1].split('?')[0];
                           }
-                          className="w-full h-full"
-                          frameBorder="0"
-                          allowFullScreen
-                          title={currentContent.title}
-                        />
-                      ) : (
-                        <video
-                          src={currentContent.video_url}
-                          controls
-                          className="w-full h-full object-cover"
-                          preload="metadata"
-                        >
-                          <p className="text-muted-foreground p-4">
-                            เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ
-                          </p>
-                        </video>
-                      )
+                          
+                          if (videoId) {
+                            embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                            return (
+                              <iframe
+                                src={embedUrl}
+                                className="w-full h-full"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                title={currentContent.title}
+                              />
+                            );
+                          }
+                        }
+                        
+                        // Regular video file
+                        if (url.match(/\.(mp4|webm|ogg|mov|avi)$/i)) {
+                          return (
+                            <video
+                              src={url}
+                              controls
+                              className="w-full h-full object-cover"
+                              preload="metadata"
+                            >
+                              <p className="text-muted-foreground p-4">
+                                เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ
+                              </p>
+                            </video>
+                          );
+                        }
+                        
+                        // Fallback for unsupported formats
+                        return (
+                          <div className="flex items-center justify-center h-full bg-muted">
+                            <div className="text-center p-6">
+                              <Monitor className="h-16 w-16 text-primary mx-auto mb-4" />
+                              <p className="text-muted-foreground mb-2">รูปแบบวิดีโอไม่รองรับ</p>
+                              <a 
+                                href={url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline text-sm"
+                              >
+                                เปิดดูในหน้าต่างใหม่
+                              </a>
+                            </div>
+                          </div>
+                        );
+                      })()
                     ) : (
                       <div className="flex items-center justify-center h-full">
                         <div className="text-center">
