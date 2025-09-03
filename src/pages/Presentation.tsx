@@ -209,14 +209,39 @@ const Presentation = () => {
                   </div>
 
                   {/* Video Display */}
-                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center mb-6">
-                    <div className="text-center">
-                      <Monitor className="h-16 w-16 text-primary mx-auto mb-4" />
-                      <p className="text-muted-foreground">วิดีโอจะแสดงที่นี่</p>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        URL: {currentContent.video_url}
-                      </p>
-                    </div>
+                  <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-6">
+                    {currentContent.video_url ? (
+                      currentContent.video_url.includes('youtube.com') || currentContent.video_url.includes('youtu.be') ? (
+                        <iframe
+                          src={currentContent.video_url.includes('youtube.com') 
+                            ? currentContent.video_url.replace('watch?v=', 'embed/')
+                            : currentContent.video_url.replace('youtu.be/', 'youtube.com/embed/')
+                          }
+                          className="w-full h-full"
+                          frameBorder="0"
+                          allowFullScreen
+                          title={currentContent.title}
+                        />
+                      ) : (
+                        <video
+                          src={currentContent.video_url}
+                          controls
+                          className="w-full h-full object-cover"
+                          preload="metadata"
+                        >
+                          <p className="text-muted-foreground p-4">
+                            เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ
+                          </p>
+                        </video>
+                      )
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center">
+                          <Monitor className="h-16 w-16 text-primary mx-auto mb-4" />
+                          <p className="text-muted-foreground">ไม่มีวิดีโอ</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Navigation Controls */}
