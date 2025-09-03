@@ -43,19 +43,28 @@ const Presentation = () => {
 
   const initializePresentation = async () => {
     try {
-      // Create a new presentation session
-      const { data, error } = await supabase
-        .from('presentations')
-        .insert({
-          title: `การนำเสนอ ${new Date().toLocaleString('th-TH')}`,
-          presenter_name: 'ผู้นำเสนอ',
-          status: 'active'
-        })
-        .select()
-        .single();
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Create a new presentation session for authenticated user
+        const { data, error } = await supabase
+          .from('presentations')
+          .insert({
+            title: `การนำเสนอ ${new Date().toLocaleString('th-TH')}`,
+            presenter_name: 'ผู้นำเสนอ',
+            status: 'active',
+            user_id: user.id
+          })
+          .select()
+          .single();
 
-      if (error) throw error;
-      setPresentationId(data.id);
+        if (error) throw error;
+        setPresentationId(data.id);
+      } else {
+        // For demo purposes, generate a temporary session ID
+        setPresentationId(crypto.randomUUID());
+      }
 
       // Load initial content library
       const { data: content, error: contentError } = await supabase
