@@ -49,7 +49,7 @@ const Index = () => {
           <Link to="/presentation">
             <Button size="lg" className="bg-gradient-crown hover:shadow-crown text-primary-foreground px-8 py-4 text-lg transition-elegant shadow-diamond">
               <Presentation className="mr-3 h-6 w-6" />
-              เริ่มการนำเสนอ
+              AI Sponsor
             </Button>
           </Link>
         </div>
