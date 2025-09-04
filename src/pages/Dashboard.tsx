@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Crown, Diamond, Brain, Video, History, Settings, Presentation } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Crown, Diamond, Brain, Video, History, Settings, Presentation, Upload, Sparkles } from "lucide-react";
 
 const Dashboard = () => {
   return (
@@ -63,6 +65,47 @@ const Dashboard = () => {
                   เข้าสู่ระบบจัดการ
                 </Button>
               </Link>
+            </CardContent>
+          </Card>
+
+          {/* Fine-tune AI */}
+          <Card className="bg-gradient-card border-primary/10 shadow-diamond hover:shadow-crown transition-elegant group col-span-full">
+            <CardHeader>
+              <Sparkles className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-elegant" />
+              <CardTitle className="text-foreground">Fine-tune AI</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                ปรับแต่ง AI ด้วย prompt และอัพโหลดเอกสารเพื่อเรียนรู้ข้อมูลธุรกิจ
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-foreground">Custom Prompt</label>
+                  <Textarea 
+                    placeholder="เขียน prompt เพื่อปรับแต่งพฤติกรรมของ AI เช่น บริบทธุรกิจ, รูปแบบการตอบ, หรือข้อมูลเฉพาะที่ต้องการให้ AI จำ..."
+                    className="min-h-[100px] resize-none"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-foreground">อัพโหลดเอกสาร</label>
+                  <div className="border-2 border-dashed border-primary/20 rounded-lg p-6 text-center hover:border-primary/40 transition-colors">
+                    <Upload className="h-8 w-8 text-primary mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">ลากไฟล์มาวางหรือคลิกเพื่อเลือก</p>
+                    <Input type="file" className="hidden" id="document-upload" multiple accept=".pdf,.doc,.docx,.txt" />
+                    <Button variant="outline" size="sm" onClick={() => document.getElementById('document-upload')?.click()}>
+                      เลือกไฟล์
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button className="bg-gradient-crown hover:shadow-crown transition-elegant">
+                  บันทึก Fine-tune
+                </Button>
+                <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
+                  ทดสอบ AI
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
