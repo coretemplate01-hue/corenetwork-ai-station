@@ -358,7 +358,7 @@ const Presentation = () => {
                     {isLoading ? (
                       <Loader2 className="h-3 w-3 animate-spin" />
                     ) : (
-                      <Send className="h-3 w-3" />
+                      <span className="text-xs">AI Sponsor</span>
                     )}
                   </Button>
                 </div>
@@ -385,16 +385,35 @@ const Presentation = () => {
                 {/* AI Responses */}
                 {(aiResponse || suggestion) && (
                   <div className="space-y-2">
-                    {aiResponse && (
+                    {currentContent && (
                       <div className="bg-muted/50 rounded-md p-3">
-                        <p className="text-xs font-medium text-foreground mb-1">AI ตอบ:</p>
-                        <p className="text-xs text-muted-foreground">{aiResponse}</p>
+                        <p className="text-xs font-medium text-foreground mb-1">AI Sponsor:</p>
+                        <p className="text-xs text-muted-foreground">{currentContent.description}</p>
+                        {currentContent.keywords && currentContent.keywords.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {currentContent.keywords.slice(0, 3).map((keyword, index) => (
+                              <Badge key={index} variant="outline" className="text-xs px-1 py-0">
+                                {keyword}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                     {suggestion && (
                       <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
-                        <p className="text-xs font-medium text-primary mb-1">คำแนะนำ:</p>
-                        <p className="text-xs text-primary/80">{suggestion}</p>
+                        <p className="text-xs font-medium text-primary mb-1">วิดีโอแนะนำ:</p>
+                        <div className="space-y-2">
+                          {contentLibrary.filter(item => item.id !== currentContent?.id).slice(0, 2).map((video, index) => (
+                            <div key={video.id} className="flex items-start gap-2">
+                              <span className="text-xs text-primary/60 font-medium">{index + 1}.</span>
+                              <div>
+                                <p className="text-xs text-primary font-medium">{video.title}</p>
+                                <p className="text-xs text-primary/60 line-clamp-1">{video.description}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -433,7 +452,7 @@ const Presentation = () => {
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Send className="h-4 w-4" />
+                      <span className="text-xs">AI Sponsor</span>
                     )}
                   </Button>
                 </div>
