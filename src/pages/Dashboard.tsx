@@ -1,11 +1,163 @@
 import { Link } from "react-router-dom";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Crown, Diamond, Brain, Video, History, Settings, Presentation, Upload, Sparkles } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Crown, Diamond, Brain, Video, History, Settings, Presentation, Upload, Sparkles, Loader2 } from "lucide-react";
 
 const Dashboard = () => {
+  const [prompt, setPrompt] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleSaveFindTune = async () => {
+    if (!prompt.trim()) {
+      toast({
+        title: "กรุณาใส่ prompt",
+        description: "โปรดเขียน prompt ก่อนบันทึก",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "กรุณาเข้าสู่ระบบ",
+          description: "โปรดเข้าสู่ระบบก่อนใช้งาน",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Deactivate existing prompts
+      await supabase
+        .from('ai_prompts')
+        .update({ is_active: false })
+        .eq('user_id', user.id);
+
+      // Save new prompt
+      const { error } = await supabase
+        .from('ai_prompts')
+        .insert({
+          user_id: user.id,
+          prompt_text: prompt,
+          is_active: true,
+        });
+
+      if (error) throw error;
+
+      // Upload and process documents
+      for (const file of uploadedFiles) {
+        await uploadAndProcessDocument(file, user.id);
+      }
+
+      toast({
+        title: "บันทึกสำเร็จ",
+        description: "Fine-tune AI เรียบร้อยแล้ว",
+      });
+
+      setPrompt('');
+      setUploadedFiles([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error) {
+      console.error('Error saving fine-tune:', error);
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถบันทึก Fine-tune ได้",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const uploadAndProcessDocument = async (file: File, userId: string) => {
+    // Upload file to storage
+    const fileName = `${userId}/${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from('documents')
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    // Save document metadata
+    const { data: docData, error: docError } = await supabase
+      .from('knowledge_documents')
+      .insert({
+        user_id: userId,
+        filename: file.name,
+        file_path: fileName,
+      })
+      .select('id')
+      .single();
+
+    if (docError) throw docError;
+
+    // Process document (extract text and create embeddings)
+    const { data: { session } } = await supabase.auth.getSession();
+    await supabase.functions.invoke('process-document', {
+      body: { documentId: docData.id },
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      setUploadedFiles(prev => [...prev, ...files]);
+    }
+  };
+
+  const handleTestAI = async () => {
+    if (!prompt.trim()) {
+      toast({
+        title: "กรุณาใส่ prompt ก่อน",
+        description: "โปรดเขียน prompt และบันทึกก่อนทดสอบ",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke('ai-content-finder', {
+        body: { 
+          command: 'ทดสอบ AI ที่ได้รับการ fine-tune แล้ว',
+          presentationId: null 
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "ทดสอบ AI สำเร็จ",
+        description: data.aiResponse || 'AI ตอบสนองแล้ว',
+      });
+    } catch (error) {
+      console.error('Error testing AI:', error);
+      toast({
+        title: "เกิดข้อผิดพลาดในการทดสอบ",
+        description: "ไม่สามารถทดสอบ AI ได้",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-hero">
       <div className="container mx-auto px-6 py-8">
@@ -84,6 +236,8 @@ const Dashboard = () => {
                   <Textarea 
                     placeholder="เขียน prompt เพื่อปรับแต่งพฤติกรรมของ AI เช่น บริบทธุรกิจ, รูปแบบการตอบ, หรือข้อมูลเฉพาะที่ต้องการให้ AI จำ..."
                     className="min-h-[100px] resize-none"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
                   />
                 </div>
                 <div className="space-y-3">
@@ -91,18 +245,40 @@ const Dashboard = () => {
                   <div className="border-2 border-dashed border-primary/20 rounded-lg p-6 text-center hover:border-primary/40 transition-colors">
                     <Upload className="h-8 w-8 text-primary mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground mb-2">ลากไฟล์มาวางหรือคลิกเพื่อเลือก</p>
-                    <Input type="file" className="hidden" id="document-upload" multiple accept=".pdf,.doc,.docx,.txt" />
-                    <Button variant="outline" size="sm" onClick={() => document.getElementById('document-upload')?.click()}>
+                    <Input 
+                      ref={fileInputRef}
+                      type="file" 
+                      className="hidden" 
+                      id="document-upload" 
+                      multiple 
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={handleFileSelect}
+                    />
+                    <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
                       เลือกไฟล์
                     </Button>
+                    {uploadedFiles.length > 0 && (
+                      <div className="mt-2 text-sm text-foreground">
+                        {uploadedFiles.length} ไฟล์ที่เลือก: {uploadedFiles.map(f => f.name).join(', ')}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
-                <Button className="bg-gradient-crown hover:shadow-crown transition-elegant">
+                <Button 
+                  className="bg-gradient-crown hover:shadow-crown transition-elegant"
+                  onClick={handleSaveFindTune}
+                  disabled={isLoading}
+                >
+                  {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                   บันทึก Fine-tune
                 </Button>
-                <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
+                <Button 
+                  variant="outline" 
+                  className="border-primary/20 text-primary hover:bg-primary/10"
+                  onClick={handleTestAI}
+                >
                   ทดสอบ AI
                 </Button>
               </div>

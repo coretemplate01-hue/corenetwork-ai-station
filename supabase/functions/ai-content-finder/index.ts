@@ -27,6 +27,51 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Get user from authorization header
+    const authHeader = req.headers.get('authorization');
+    let userId = null;
+    let customPrompt = '';
+    let knowledgeContext = '';
+
+    if (authHeader) {
+      try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser(
+          authHeader.replace('Bearer ', '')
+        );
+        if (!authError && user) {
+          userId = user.id;
+          
+          // Get user's active custom prompt
+          const { data: promptData } = await supabase
+            .from('ai_prompts')
+            .select('prompt_text')
+            .eq('user_id', userId)
+            .eq('is_active', true)
+            .single();
+          
+          if (promptData) {
+            customPrompt = promptData.prompt_text;
+          }
+
+          // Get user's knowledge documents for context
+          const { data: docsData } = await supabase
+            .from('knowledge_documents')
+            .select('content_text, filename')
+            .eq('user_id', userId)
+            .eq('processed', true)
+            .limit(5);
+          
+          if (docsData && docsData.length > 0) {
+            knowledgeContext = docsData
+              .map(doc => `[${doc.filename}]: ${doc.content_text?.substring(0, 500)}...`)
+              .join('\n\n');
+          }
+        }
+      } catch (error) {
+        console.log('Auth error (continuing with public access):', error);
+      }
+    }
+
     // Get all content from the library
     const { data: contentLibrary, error: contentError } = await supabase
       .from('content_library')
@@ -76,6 +121,9 @@ serve(async (req) => {
               text: `คุณเป็น AI Assistant สำหรับระบบนำเสนอของ Crown Diamond Station - WCI-CoreNetwork
               ภารกิจของคุณคือวิเคราะห์คำสั่งจากผู้นำเสนอ และหาเนื้อหาที่เหมาะสมที่สุดจากคลังเนื้อหา
               
+              ${customPrompt ? `คำแนะนำเพิ่มเติมจากผู้ใช้: ${customPrompt}\n` : ''}
+              ${knowledgeContext ? `ข้อมูลธุรกิจที่เกี่ยวข้อง:\n${knowledgeContext}\n` : ''}
+              
               คลังเนื้อหาที่มี:
               ${contentDescriptions}
               
@@ -84,8 +132,8 @@ serve(async (req) => {
               ให้ตอบกลับในรูปแบบ JSON ดังนี้:
               {
                 "selectedContentId": "UUID ของเนื้อหาที่เลือก หรือ null ถ้าไม่พบเนื้อหาที่เหมาะสม",
-                "response": "คำตอบที่เป็นมิตรและชี้แจงว่าทำไมเลือกเนื้อหานี้ หรือแนะนำทางเลือกอื่น",
-                "suggestion": "คำแนะนำเพิ่มเติมสำหรับการนำเสนอ"
+                "response": "คำตอบที่เป็นมิตรและชี้แจงว่าทำไมเลือกเนื้อหานี้ หรือแนะนำทางเลือกอื่น โดยใช้ข้อมูลธุรกิจที่มีให้เป็นบริบท",
+                "suggestion": "คำแนะนำเพิ่มเติมสำหรับการนำเสนอ โดยอิงจากข้อมูลธุรกิจและคำแนะนำจากผู้ใช้"
               }`
             }]
           }],
