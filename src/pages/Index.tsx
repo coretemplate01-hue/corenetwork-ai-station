@@ -14,7 +14,7 @@ const Index = () => {
               <Crown className="h-8 w-8 text-primary" />
               <Diamond className="h-4 w-4 text-primary-light absolute -top-1 -right-1" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-crown bg-clip-text text-transparent">Crown Diamond Station</span>
+            <span className="text-2xl font-bold bg-gradient-crown bg-clip-text text-transparent">CoreNetwork Station</span>
           </div>
           <Link to="/dashboard">
             <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10 transition-elegant">
@@ -36,11 +36,11 @@ const Index = () => {
           </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
             <span className="bg-gradient-crown bg-clip-text text-transparent">
-              Crown Diamond Station
+              CoreNetwork Station
             </span>
           </h1>
           <p className="text-2xl md:text-3xl text-primary mb-8 font-medium">
-            ขอต้อนรับสู่ธุรกิจ WCI-CoreNetwork
+            ขอต้อนรับสู่ระบบ AI Sponsor
           </p>
           <p className="text-lg text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
             ระบบนำเสนอขั้นสูงด้วยปัญญาประดิษฐ์ที่ช่วยให้การสื่อสารธุรกิจของคุณมีประสิทธิภาพสูงสุด 
@@ -111,7 +111,7 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="container mx-auto px-6 py-8 text-center text-muted-foreground">
-        <p>© 2024 Crown Diamond Station - WCI-CoreNetwork. ระบบนำเสนอขั้นสูงด้วยเทคโนโลยี AI</p>
+        <p>© 2024 CoreNetwork Station - WCI-CoreNetwork. ระบบนำเสนอขั้นสูงด้วยเทคโนโลยี AI</p>
       </footer>
     </div>
   );
