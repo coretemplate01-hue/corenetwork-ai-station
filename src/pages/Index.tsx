@@ -111,7 +111,7 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="container mx-auto px-6 py-8 text-center text-muted-foreground">
-        <p>© 2024 CoreNetwork Station - WCI-CoreNetwork. ระบบนำเสนอขั้นสูงด้วยเทคโนโลยี AI</p>
+        <p>© 2025 CoreNetwork Station ระบบนำเสนอขั้นสูงด้วยเทคโนโลยี AI</p>
       </footer>
     </div>
   );
