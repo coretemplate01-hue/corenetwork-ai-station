@@ -214,13 +214,13 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Manage AI Agent */}
+          {/* Content Management */}
           <Card className="bg-gradient-card border-primary/10 shadow-diamond hover:shadow-crown transition-elegant group">
             <CardHeader>
               <Brain className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-elegant" />
-              <CardTitle className="text-foreground">จัดการ AI Agent</CardTitle>
+              <CardTitle className="text-foreground">จัดการเนื้อหา & AI</CardTitle>
               <CardDescription className="text-muted-foreground">
-                บริหารคลังเนื้อหา ดูประวัติ และตั้งค่า AI Agent
+                บริหารคลังเนื้อหา วิดีโอ ดูประวัติการนำเสนอ และตั้งค่า AI Agent
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -294,42 +294,6 @@ const Dashboard = () => {
                   ทดสอบ AI
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Content Library */}
-          <Card className="bg-gradient-card border-primary/10 shadow-diamond hover:shadow-crown transition-elegant group">
-            <CardHeader>
-              <Video className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-elegant" />
-              <CardTitle className="text-foreground">คลังเนื้อหา</CardTitle>
-              <CardDescription className="text-muted-foreground">
-                จัดการวิดีโอและเนื้อหาที่ AI จะใช้ในการนำเสนอ
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link to="/dashboard/presentation-manager">
-                <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/10 transition-elegant">
-                  จัดการคลังเนื้อหา
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* Presentation History */}
-          <Card className="bg-gradient-card border-primary/10 shadow-diamond hover:shadow-crown transition-elegant group">
-            <CardHeader>
-              <History className="h-12 w-12 text-primary mb-4 group-hover:scale-110 transition-elegant" />
-              <CardTitle className="text-foreground">ประวัติการนำเสนอ</CardTitle>
-              <CardDescription className="text-muted-foreground">
-                ดูประวัติคำสั่งและการตอบสนองของ AI ที่ผ่านมา
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link to="/dashboard/presentation-manager">
-                <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/10 transition-elegant">
-                  ดูประวัติ
-                </Button>
-              </Link>
             </CardContent>
           </Card>
 
