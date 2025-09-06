@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown, Diamond, Brain, Video, History, Settings, Presentation, Upload, Sparkles, Loader2 } from "lucide-react";
+import { Crown, Diamond, Brain, Video, History, Settings, Presentation, Upload, Sparkles, Loader2, LogOut } from "lucide-react";
 
 const Dashboard = () => {
   const [prompt, setPrompt] = useState('');
@@ -14,6 +15,7 @@ const Dashboard = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { logout } = useAuth();
 
   const handleSaveFindTune = async () => {
     if (!prompt.trim()) {
@@ -175,11 +177,21 @@ const Dashboard = () => {
               <p className="text-muted-foreground">Dashboard จัดการระบบ AI Presentation Agent</p>
             </div>
           </div>
-          <Link to="/">
-            <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
-              กลับหน้าแรก
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              className="border-red-500/20 text-red-600 hover:bg-red-500/10"
+              onClick={logout}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              ออกจากระบบ
             </Button>
-          </Link>
+            <Link to="/">
+              <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/10">
+                กลับหน้าแรก
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Main Dashboard Grid */}
